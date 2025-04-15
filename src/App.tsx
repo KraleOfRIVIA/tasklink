@@ -1,35 +1,102 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { JSX, useEffect, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { observer } from 'mobx-react-lite';
+import { authStore } from './stores/authStore';
 
-function App() {
-  const [count, setCount] = useState(0)
+import LoginPage from './pages/LoginPage';
+import DashboardPage from './pages/DashboardPage';
+import AdminDashboardPage from './pages/AdminDashboardPage';
+import ProjectsPage from './pages/ProjectsPage';
+import TasksPage from './pages/TasksPage';
+import TimeTrackingPage from './pages/TimeTrackingPage';
+
+import DashboardLayout from './components/ui/layouts/DashboardLayout';
+
+const App = observer(() => {
+  const [sessionChecked, setSessionChecked] = useState(false);
+
+  useEffect(() => {
+    const init = async () => {
+      await authStore.checkSession(); // подождем завершения
+      setSessionChecked(true);
+    };
+    init();
+  }, []);
+
+  if (!sessionChecked || authStore.loading) {
+    return <div className="p-4">Загрузка...</div>;
+  }
+
+  const ProtectedRoute = (Component: JSX.Element) =>
+    authStore.isAuth ? Component : <Navigate to="/login" replace />;
+
+  const AdminRoute = (Component: JSX.Element) =>
+    authStore.isAuth && authStore.user?.role === 'admin'
+      ? Component
+      : <Navigate to="/login" replace />;
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <Router>
+      <Routes>
+        {/* Public */}
+        <Route path="/login" element={<LoginPage />} />
 
-export default App
+        {/* Protected */}
+        <Route
+          path="/dashboard"
+          element={ProtectedRoute(
+            <DashboardLayout>
+              <DashboardPage />
+            </DashboardLayout>
+          )}
+        />
+        <Route
+          path="/projects"
+          element={ProtectedRoute(
+            <DashboardLayout>
+              <ProjectsPage />
+            </DashboardLayout>
+          )}
+        />
+        <Route
+          path="/tasks"
+          element={ProtectedRoute(
+            <DashboardLayout>
+              <TasksPage />
+            </DashboardLayout>
+          )}
+        />
+        <Route
+          path="/time"
+          element={ProtectedRoute(
+            <DashboardLayout>
+              <TimeTrackingPage />
+            </DashboardLayout>
+          )}
+        />
+        <Route
+          path="/admin"
+          element={AdminRoute(
+            <DashboardLayout>
+              <AdminDashboardPage />
+            </DashboardLayout>
+          )}
+        />
+
+        {/* Default */}
+        <Route
+          path="*"
+          element={
+            authStore.isAuth ? (
+              <Navigate to="/dashboard" />
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+      </Routes>
+    </Router>
+  );
+});
+
+export default App;
