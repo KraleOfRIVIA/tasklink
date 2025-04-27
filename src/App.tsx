@@ -7,6 +7,7 @@ import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import ProjectsPage from './pages/ProjectsPage';
+import ProjectPage from './components/ProjectPage';
 import TasksPage from './pages/TasksPage';
 import TimeTrackingPage from './pages/TimeTrackingPage';
 
@@ -17,7 +18,7 @@ const App = observer(() => {
 
   useEffect(() => {
     const init = async () => {
-      await authStore.checkSession(); // подождем завершения
+      await authStore.checkSession();
       setSessionChecked(true);
     };
     init();
@@ -55,6 +56,14 @@ const App = observer(() => {
           element={ProtectedRoute(
             <DashboardLayout>
               <ProjectsPage />
+            </DashboardLayout>
+          )}
+        />
+        <Route
+          path="/projects/:id"
+          element={ProtectedRoute(
+            <DashboardLayout>
+              <ProjectPage />
             </DashboardLayout>
           )}
         />
