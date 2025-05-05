@@ -2,6 +2,7 @@ import { observer } from "mobx-react-lite";
 import { useEffect } from "react";
 import { taskStore } from "@/stores/taskStore";
 import { authStore } from "@/stores/authStore";
+import { workLogStore } from "@/stores/workLogStore";
 import AddTimeDrawer from "@/components/time/AddTimeDrawer";
 import { format } from "date-fns";
 
@@ -11,6 +12,7 @@ const TimeTrackingPage = observer(() => {
   useEffect(() => {
     if (userId) {
       taskStore.fetchUserTasks(userId);
+      workLogStore.fetchLogsByUser(userId);
     }
   }, [userId]);
 
@@ -38,19 +40,14 @@ const TimeTrackingPage = observer(() => {
                     : "Не указан"}
                 </p>
                 <p className="text-xs text-gray-500">
-                  Затрачено: {task.time_spent || 0} мин.
+                  Затрачено: {workLogStore.getTotalHoursForTask(task.id).toFixed(2)} ч.
                 </p>
               </div>
 
               <AddTimeDrawer
                 task={task}
-                onSubmit={(minutes, comment) => {
-                  console.log("Сохранить в БД:", {
-                    taskId: task.id,
-                    minutes,
-                    comment,
-                  });
-                  // TODO: добавить вызов API/стора
+                onSubmit={(hours) => {
+                  workLogStore.addLog(task.id, hours);
                 }}
               />
             </div>
