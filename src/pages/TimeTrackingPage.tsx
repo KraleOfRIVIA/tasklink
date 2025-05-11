@@ -16,17 +16,22 @@ const TimeTrackingPage = observer(() => {
     }
   }, [userId]);
 
+  // ⛳️ Фильтрация только активных задач
+  const activeTasks = taskStore.tasks.filter(
+    (task) => task.status !== "завершена"
+  );
+
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Мои задачи</h1>
 
       {taskStore.loading ? (
         <p>Загрузка задач...</p>
-      ) : taskStore.tasks.length === 0 ? (
-        <p>Нет назначенных задач</p>
+      ) : activeTasks.length === 0 ? (
+        <p>Нет активных задач</p>
       ) : (
         <div className="space-y-4">
-          {taskStore.tasks.map((task) => (
+          {activeTasks.map((task) => (
             <div
               key={task.id}
               className="border rounded-xl p-4 shadow-sm bg-white flex flex-col md:flex-row md:items-center justify-between gap-2"
@@ -40,7 +45,7 @@ const TimeTrackingPage = observer(() => {
                     : "Не указан"}
                 </p>
                 <p className="text-xs text-gray-500">
-                  Затрачено: {workLogStore.getTotalHoursForTask(task.id).toFixed(2)} ч.
+                  Затрачено: {workLogStore.getTotalHoursForTask(task.id)} ч.
                 </p>
               </div>
 

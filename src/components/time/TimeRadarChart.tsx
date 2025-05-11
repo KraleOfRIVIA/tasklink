@@ -1,51 +1,60 @@
-import { Radar } from 'react-chartjs-2'
+import { useEffect, useState } from 'react'
 import {
   Chart as ChartJS,
-  RadialLinearScale,
-  PointElement,
-  LineElement,
-  Filler,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
   Tooltip,
   Legend,
 } from 'chart.js'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
+import { Bar } from 'react-chartjs-2'
+import { workLogStore } from '@/stores/workLogStore'
 
-ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend)
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
-const data = {
-  labels: ['Задача A', 'Задача B', 'Задача C', 'Задача D', 'Задача E'],
-  datasets: [
-    {
-      label: 'Потраченное время (часы)',
-      data: [12, 5, 9, 3, 0],
-      backgroundColor: 'rgba(34, 197, 94, 0.2)',
-      borderColor: 'rgba(34, 197, 94, 1)',
-      borderWidth: 2,
-    },
-  ],
-}
+export default function TimeBarChart() {
+  const [chartData, setChartData] = useState<{ title: string; hours: number }[]>([])
 
-const options = {
-  responsive: true,
-  scales: {
-    r: {
-      ticks: {
-        beginAtZero: true,
-        stepSize: 2,
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await workLogStore.getRadarDataForUser() // используется тот же метод, можно переименовать
+      setChartData(data)
+    }
+
+    fetchData()
+  }, [])
+
+  const labels = chartData.map((item) => item.title)
+  const data = {
+    labels,
+    datasets: [
+      {
+        label: 'Потрачено часов',
+        data: chartData.map((item) => item.hours),
+        backgroundColor: 'rgba(34, 197, 94, 0.6)', // зеленоватый
+      },
+    ],
+  }
+
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top' as const,
+      },
+      title: {
+        display: true,
+        text: 'Потраченное время по задачам',
       },
     },
-  },
-}
+    scales: {
+      y: {
+        beginAtZero: true,
+        stepSize: 1,
+      },
+    },
+  }
 
-export function TimeRadarChart() {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Распределение времени по задачам</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Radar data={data} options={options} />
-      </CardContent>
-    </Card>
-  )
+  return <Bar options={options} data={data} />
 }
