@@ -37,7 +37,6 @@ class WorkLogStore {
       return;
     }
 
-    // обновляем логи после добавления
     await this.fetchLogsByUser(userId);
   }
 
@@ -65,7 +64,6 @@ class WorkLogStore {
     const userId = authStore.user?.id;
     if (!userId) return [];
   
-    // Шаг 1: Получаем логи пользователя
     const { data: logs, error: logsError } = await supabase
       .from("work_logs")
       .select("task_id, hours")
@@ -76,12 +74,10 @@ class WorkLogStore {
       return [];
     }
   
-    // Извлекаем task_id
     const taskIds = [...new Set(logs.map((log) => log.task_id))];
   
     if (taskIds.length === 0) return [];
   
-    // Шаг 2: Получаем задачи по этим task_id
     const { data: tasks, error: tasksError } = await supabase
       .from("tasks")
       .select("id, title, assigned_to")
@@ -92,7 +88,6 @@ class WorkLogStore {
       return [];
     }
   
-    // Шаг 3: Группируем часы по названиям задач, только если задача назначена текущему пользователю
     const titleMap: Record<string, number> = {};
   
     for (const log of logs) {

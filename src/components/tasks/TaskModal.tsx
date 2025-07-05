@@ -79,16 +79,16 @@ export default function TaskModal({ open, onClose, onSubmit, initialData }: Prop
           </div>
 
           <div>
-  <Label>Дедлайн</Label>
-  <Input
-    type="date"
-    value={deadline ? deadline.toISOString().split("T")[0] : ""}
-    onChange={(e) => {
-      const value = e.target.value;
-      setDeadline(value ? new Date(value) : undefined);
-    }}
-  />
-</div>
+          <Label>Дедлайн</Label>
+          <Input
+            type="date"
+            value={deadline ? deadline.toISOString().split("T")[0] : ""}
+            onChange={(e) => {
+              const value = e.target.value;
+              setDeadline(value ? new Date(value) : undefined);
+            }}
+          />
+        </div>
 
         </div>
 

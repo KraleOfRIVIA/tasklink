@@ -15,7 +15,7 @@ import DashboardLayout from './components/ui/layouts/DashboardLayout';
 
 const App = observer(() => {
   const [sessionChecked, setSessionChecked] = useState(false);
-
+  const v = 'react';
   useEffect(() => {
     const init = async () => {
       await authStore.checkSession();

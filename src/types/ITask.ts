@@ -5,7 +5,7 @@ export interface Task {
     project_id: string;
     title: string;
     description: string;
-    assigned_to: string | null; // <== исправлено
+    assigned_to: string | null; 
     status: string;
     deadline: string;
     created_at: string;

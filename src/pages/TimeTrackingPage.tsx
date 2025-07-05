@@ -16,7 +16,6 @@ const TimeTrackingPage = observer(() => {
     }
   }, [userId]);
 
-  // ⛳️ Фильтрация только активных задач
   const activeTasks = taskStore.tasks.filter(
     (task) => task.status !== "завершена"
   );

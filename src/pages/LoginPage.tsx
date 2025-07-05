@@ -12,11 +12,19 @@ const LoginPage = observer(() => {
   }
 
   const handleLogin = async () => {
-    const success = await authStore.login(email, password);
-    if (!success) {
-      setErrorMsg('Неверный логин или пароль');
-    }
-  };
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+  if (!emailRegex.test(email)) {
+    setErrorMsg('Введите корректный email, только латинские буквы');
+    return;
+  }
+
+  const success = await authStore.login(email, password);
+  if (!success) {
+    setErrorMsg('Неверный логин или пароль');
+  }
+};
+
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
@@ -26,7 +34,12 @@ const LoginPage = observer(() => {
           type="email"
           placeholder="Email"
           value={email}
-          onChange={e => setEmail(e.target.value)}
+          onChange={e => {
+            const value = e.target.value;
+  // eslint-disable-next-line no-control-regex
+            if (/^[\x00-\x7F]*$/.test(value)) { // ASCII only
+            setEmail(value);}
+            }}
           className="w-full border p-2 mb-3"
         />
         <input

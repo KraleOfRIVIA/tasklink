@@ -1,4 +1,3 @@
-// stores/projectStore.ts
 import { makeAutoObservable, runInAction } from 'mobx';
 import { supabase } from '../api/supabaseClient';
 import { Project } from '@/types/IProject';
